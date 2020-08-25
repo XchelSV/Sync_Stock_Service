@@ -1,3 +1,5 @@
+const { parse } = require("path");
+
 const WooCommerceRestApi = require("@woocommerce/woocommerce-rest-api").default;
 const WooCommerce = new WooCommerceRestApi({
     url: process.env.WOOCOMMERCE_URL, // Your store URL
@@ -5,6 +7,8 @@ const WooCommerce = new WooCommerceRestApi({
     consumerSecret: process.env.WOOCOMMERCE_PRIVATE_KEY, // Your consumer secret
     version: 'wc/v3' // WooCommerce WP REST API version
 });
+const { sendMail } = require('./send_mail');
+const logger = require('../logger/setup');
 
 exports.getWoocommerceRootAndChildBySKU = async (sku) => {
     try{
@@ -61,10 +65,32 @@ exports.getWoocommerceRootAndChildBySKU = async (sku) => {
     }
     catch(error){
         console.log(error)
+        logger.error(`getWoocommerceRootAndChildBySKU function, error: ${JSON.stringify(error)}`);
         return null;
     }
 }
 
-exports.substract_product = () => {
+exports.substract_product = (woocommerce_product, quantity) => {
+
+    let stock_quantity = parseInt(woocommerce_product.child_product.stock_quantity) - parseInt(quantity);
+    if (stock_quantity < 0)
+        stock_quantity = 0;
+    WooCommerce.put(`products/${woocommerce_product.root_product.id}/variations/${woocommerce_product.child_product.id}`, {
+        stock_quantity
+    })
+    .then( async (response) => {
+        sendMail( 'xchel.sanchez@mtsport.com.mx', 'PRODUCTO VENDIDO EN PISO ✌📌' , 
+            `<p>Se actualizo el stock del producto ${woocommerce_product.child_product.sku}, se restaron ${quantity} unidades, para terminar con un stock de ${stock_quantity} unidades </p>`
+        ).then( () => {
+            console.log('Mail Sended')
+        }).catch( error => {
+            console.log(JSON.stringify(error.response)) 
+            logger.error(`sendMail function, error: ${JSON.stringify(error)}`);
+        })
+    })
+    .catch( async (error) => {
+        console.log(error.response.data);
+        logger.fatal(`substract_product function, error: ${JSON.stringify(error.response)}`);
+    });
 
 }
