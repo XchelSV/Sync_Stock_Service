@@ -1,4 +1,5 @@
 let db = require('../firebase/setup');
+const logger = require('../logger/setup');
 
 exports.get_product_from_ticket_venta = (json_file) => {
     try{
@@ -23,6 +24,7 @@ exports.get_product_from_ticket_venta = (json_file) => {
     }
     catch(error){
         console.log(error)
+        logger.error(`get_product_from_ticket_venta function, error: ${JSON.stringify(error)}`);
         return [];
     }
 }
@@ -34,6 +36,7 @@ exports.search_transaction_into_firestore = async (transaction) => {
     })
     .catch((err) => {
         console.log('Error getting documents', err);
+        logger.error(`search_transaction_into_firestore function, error: ${JSON.stringify(err)}`);
         return null;
     });
     return transaction_finded;
@@ -51,6 +54,7 @@ exports.save_transaction_into_firestore = (transaction) => {
         return true;
     }
     catch(error){
+        logger.fatal(`save_transaction_into_firestore function, error: ${JSON.stringify(error)}`);
         return false;
     }
 }
