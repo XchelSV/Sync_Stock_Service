@@ -2,16 +2,23 @@ require('dotenv').config();
 const fs = require('fs');
 const xml2js = require('xml2js');
 
-const { get_product_from_ticket_venta, search_transaction_into_firestore, save_transaction_into_firestore } = require('./functions/product_incidences_functions');
-const { getWoocommerceRootAndChildBySKU, substract_product } = require('./functions/woocommerce_actions');
+const { get_product_from_ticket_venta, get_product_from_cambio_fisico, search_transaction_into_firestore, save_transaction_into_firestore } = require('./functions/product_incidences_functions');
+const { getWoocommerceRootAndChildBySKU, get_woocommerce_product_list ,substract_product } = require('./functions/woocommerce_actions');
 const parser = new xml2js.Parser();
-fs.readFile(__dirname + '/xml_example_2.xml', function(err, data) {
+fs.readFile(__dirname + '/xmls/MTSPORTT0140120200801.xml', function(err, data) {
     parser.parseString(data, async function (err, json_file) {
         //Get Ticket Venta Transactions from XML
-        const product_results = get_product_from_ticket_venta(json_file);
+        const ticket_results = get_product_from_ticket_venta(json_file);
+        //Get Cambio Fisico por talla Transactions from XML
+        const cambio_results = get_product_from_cambio_fisico(json_file);
+        const product_results = [ ...ticket_results, ...cambio_results ];
+        console.log('Products length: ',product_results.length)
+        //Get E-commerce product List
+        const woocommerce_product_list = await get_woocommerce_product_list();
+        //
         for (let i = 0; i < product_results.length; i++) {
           //Search If exists product reference into woocommerce eshop
-          const woocommerce_product = await getWoocommerceRootAndChildBySKU(product_results[i].reference);
+          const woocommerce_product = await getWoocommerceRootAndChildBySKU(product_results[i].reference, woocommerce_product_list);
           console.log('woocommerce_product',product_results[i].reference, woocommerce_product ? woocommerce_product.child_product.sku : woocommerce_product);
           if (woocommerce_product){
             //Search if transactions exists into firestore
