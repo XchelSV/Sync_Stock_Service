@@ -2,16 +2,19 @@ require('dotenv').config();
 const fs = require('fs');
 const xml2js = require('xml2js');
 
-const { get_product_from_ticket_venta, get_product_from_cambio_fisico, search_transaction_into_firestore, save_transaction_into_firestore } = require('./functions/product_incidences_functions');
+const { get_product_from_ticket_venta, get_product_from_cambio_fisico, get_product_from_nota_mostrador , search_transaction_into_firestore, save_transaction_into_firestore } = require('./functions/product_incidences_functions');
 const { getWoocommerceRootAndChildBySKU, get_woocommerce_product_list ,substract_product } = require('./functions/woocommerce_actions');
 const parser = new xml2js.Parser();
-fs.readFile(__dirname + '/xmls/MTSPORTT0140120200801.xml', function(err, data) {
+fs.readFile(__dirname + '/xmls/MTSPORTT0140120200802.xml', function(err, data) {
     parser.parseString(data, async function (err, json_file) {
         //Get Ticket Venta Transactions from XML
         const ticket_results = get_product_from_ticket_venta(json_file);
         //Get Cambio Fisico por talla Transactions from XML
         const cambio_results = get_product_from_cambio_fisico(json_file);
-        const product_results = [ ...ticket_results, ...cambio_results ];
+        //Get Nota Credito Mostrador por talla Transactions from XML
+        const nota_results = get_product_from_nota_mostrador(json_file);
+
+        const product_results = [ ...ticket_results, ...cambio_results, ...nota_results ];
         console.log('Products length: ',product_results.length)
         //Get E-commerce product List
         const woocommerce_product_list = await get_woocommerce_product_list();
