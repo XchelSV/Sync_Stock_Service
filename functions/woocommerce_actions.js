@@ -10,12 +10,10 @@ const WooCommerce = new WooCommerceRestApi({
 const { sendMail } = require('./send_mail');
 const logger = require('../logger/setup');
 
-exports.getWoocommerceRootAndChildBySKU = async (sku) => {
+exports.get_woocommerce_product_list = async () => {
     try{
         let counter = 1;
-        let result = null
-        let root_product = '';
-        let child_product = '';
+        let result = [];
         flag = true;
         //Get Root Product
         while(flag){
@@ -27,17 +25,33 @@ exports.getWoocommerceRootAndChildBySKU = async (sku) => {
                     return await [];
                 });
             if (results.length > 0){
-                for (let i = 0; i < results.length; i++) {
-                    if (results[i].sku === sku.slice(0,10)){
-                        root_product = results[i];
-                        flag = false;
-                        break;
-                    }
-                }
+                result = [ ...result, ...results]
                 counter++;
             }
             else{
                 flag = false;
+            }
+        }
+        return result;
+    }
+    catch(error){
+        console.log(error)
+        logger.error(`get_woocommerce_product_list function, error: ${JSON.stringify(error)}`);
+        return null;
+    }
+}
+
+exports.getWoocommerceRootAndChildBySKU = async (sku, results) => {
+    try{
+        let counter = 1;
+        let result = null
+        let root_product = '';
+        let child_product = '';
+        //Get Root Product
+        for (let i = 0; i < results.length; i++) {
+            if (results[i].sku === sku.slice(0,10)){
+                root_product = results[i];
+                break;
             }
         }
         if (root_product !== ''){
