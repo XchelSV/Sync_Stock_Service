@@ -1,4 +1,6 @@
 const { parse } = require("path");
+const dotenv = require('dotenv');
+dotenv.config({ path: __dirname + '/./../.env' });
 
 const WooCommerceRestApi = require("@woocommerce/woocommerce-rest-api").default;
 const WooCommerce = new WooCommerceRestApi({

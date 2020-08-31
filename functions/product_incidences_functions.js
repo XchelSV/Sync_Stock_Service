@@ -1,5 +1,7 @@
 let db = require('../firebase/setup');
 const logger = require('../logger/setup');
+const dotenv = require('dotenv');
+dotenv.config({ path: __dirname + '/./../.env' });
 
 exports.get_product_from_ticket_venta = (json_file) => {
     try{
