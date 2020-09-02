@@ -6,3 +6,5 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+        volumes:
+            - ~/Documents/MTSport/temp_dir:/home/node/app
