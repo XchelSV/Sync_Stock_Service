@@ -5,8 +5,13 @@ const xml2js = require('xml2js');
 
 const { get_product_from_ticket_venta, get_product_from_cambio_fisico, get_product_from_nota_mostrador , search_transaction_into_firestore, save_transaction_into_firestore } = require('./functions/product_incidences_functions');
 const { getWoocommerceRootAndChildBySKU, get_woocommerce_product_list ,substract_product } = require('./functions/woocommerce_actions');
+const { Console } = require('console');
 const parser = new xml2js.Parser();
-fs.readFile(__dirname + '/xmls/MTSPORTT0140120200802.xml', function(err, data) {
+const current_date = new Date();
+current_date.setUTCHours(0,0,0,0)
+console.log(current_date)
+console.log(`Current path:  /xmls/${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }/${process.env.CURRENT_CADENA}${process.env.CURRENT_STORE}${process.env.CURRENT_CAJA}${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }${current_date.getDate() > 9 ? current_date.getDate() : '0'+(current_date.getDate()).toString() }.xml`);
+fs.readFile(__dirname + `/xmls/${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }/${process.env.CURRENT_CADENA}${process.env.CURRENT_STORE}${process.env.CURRENT_CAJA}${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }${current_date.getDate() > 9 ? current_date.getDate() : '0'+(current_date.getDate()).toString() }.xml`, function(err, data) {
     parser.parseString(data, async function (err, json_file) {
         //Get Ticket Venta Transactions from XML
         const ticket_results = get_product_from_ticket_venta(json_file);

@@ -7,4 +7,4 @@ services:
             context: .
             dockerfile: Dockerfile
         volumes:
-            - ~/Documents/MTSport/temp_dir:/home/node/app
+            - ~/Documents/MTSport/temp_dir:/home/node/app/xmls
