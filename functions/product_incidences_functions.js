@@ -1,5 +1,6 @@
 let db = require('../firebase/setup');
 const logger = require('../logger/setup');
+const sentry = require('../logger/sentry');
 const dotenv = require('dotenv');
 dotenv.config({ path: __dirname + '/./../.env' });
 
@@ -29,6 +30,7 @@ exports.get_product_from_ticket_venta = (json_file) => {
     catch(error){
         console.log(error)
         logger.error(`get_product_from_ticket_venta function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`get_product_from_ticket_venta`,error);
         return [];
     }
 }
@@ -59,6 +61,7 @@ exports.get_product_from_cambio_fisico= (json_file) => {
     catch(error){
         console.log(error)
         logger.error(`get_product_from_cambio_fisico function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`get_product_from_cambio_fisico`,error);
         return [];
     }
 }
@@ -89,6 +92,7 @@ exports.get_product_from_nota_mostrador= (json_file) => {
     catch(error){
         console.log(error)
         logger.error(`get_product_from_nota_mostrador function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`get_product_from_nota_mostrador`,error);
         return [];
     }
 }
@@ -101,6 +105,7 @@ exports.search_transaction_into_firestore = async (transaction) => {
     .catch((err) => {
         console.log('Error getting documents', err);
         logger.error(`search_transaction_into_firestore function, error: ${JSON.stringify(err)}`);
+        sentry.send_error(`search_transaction_into_firestore`,error);
         return null;
     });
     return transaction_finded;
@@ -119,6 +124,7 @@ exports.save_transaction_into_firestore = (transaction) => {
     }
     catch(error){
         logger.fatal(`save_transaction_into_firestore function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`save_transaction_into_firestore`,error);
         return false;
     }
 }

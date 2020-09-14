@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: __dirname + '/./.env' });
 const fs = require('fs');
 const xml2js = require('xml2js');
+const sentry = require('./logger/sentry');
 
 const { get_product_from_ticket_venta, get_product_from_cambio_fisico, get_product_from_nota_mostrador , search_transaction_into_firestore, save_transaction_into_firestore } = require('./functions/product_incidences_functions');
 const { getWoocommerceRootAndChildBySKU, get_woocommerce_product_list ,substract_product } = require('./functions/woocommerce_actions');
@@ -12,6 +13,10 @@ current_date.setUTCHours(0,0,0,0)
 console.log(current_date)
 console.log(`Current path:  /xmls/${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }/${process.env.CURRENT_CADENA}${process.env.CURRENT_STORE}${process.env.CURRENT_CAJA}${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }${current_date.getDate() > 9 ? current_date.getDate() : '0'+(current_date.getDate()).toString() }.xml`);
 fs.readFile(__dirname + `/xmls/${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }/${process.env.CURRENT_CADENA}${process.env.CURRENT_STORE}${process.env.CURRENT_CAJA}${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }${current_date.getDate() > 9 ? current_date.getDate() : '0'+(current_date.getDate()).toString() }.xml`, function(err, data) {
+    if (err){
+      sentry.send_error('reading_xml_file',err);
+      return null;
+    }
     parser.parseString(data, async function (err, json_file) {
         //Get Ticket Venta Transactions from XML
         const ticket_results = get_product_from_ticket_venta(json_file);

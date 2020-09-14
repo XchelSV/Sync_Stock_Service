@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/XchelSV/Sync_Stock_Service#readme",
   "dependencies": {
+    "@sentry/node": "^5.23.0",
+    "@sentry/tracing": "^5.23.0",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
@@ -26,6 +28,7 @@
     "mongoose": "^5.9.25",
     "nodemailer": "^6.4.11",
     "path": "^0.12.7",
+    "sentry": "^0.1.2",
     "xml2js": "^0.4.23"
   }
 }

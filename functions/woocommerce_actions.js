@@ -11,6 +11,7 @@ const WooCommerce = new WooCommerceRestApi({
 });
 const { sendMail } = require('./send_mail');
 const logger = require('../logger/setup');
+const sentry = require('../logger/sentry');
 
 exports.get_woocommerce_product_list = async () => {
     try{
@@ -39,6 +40,7 @@ exports.get_woocommerce_product_list = async () => {
     catch(error){
         console.log(error)
         logger.error(`get_woocommerce_product_list function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`get_woocommerce_product_list`,error);
         return null;
     }
 }
@@ -82,6 +84,7 @@ exports.getWoocommerceRootAndChildBySKU = async (sku, results) => {
     catch(error){
         console.log(error)
         logger.error(`getWoocommerceRootAndChildBySKU function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`getWoocommerceRootAndChildBySKU`,error);
         return null;
     }
 }
@@ -102,11 +105,13 @@ exports.substract_product = (woocommerce_product, quantity) => {
         }).catch( error => {
             console.log(JSON.stringify(error.response)) 
             logger.error(`sendMail function, error: ${JSON.stringify(error)}`);
+            sentry.send_error(`sendMail`,error);
         })
     })
     .catch( async (error) => {
         console.log(error.response.data);
         logger.fatal(`substract_product function, error: ${JSON.stringify(error.response)}`);
+        sentry.send_error(`substract_product`,error);
     });
 
 }
