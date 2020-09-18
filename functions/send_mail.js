@@ -19,6 +19,9 @@ exports.sendMail = async (mails, subject, html_body) => {
         user: process.env.smtp_user,
         serviceClient: process.env.client_id,
         privateKey: process.env.private_key
+    },
+    tls: {
+        rejectUnauthorized: false
     }
     });
 
