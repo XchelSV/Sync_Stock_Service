@@ -9,8 +9,9 @@ const { getWoocommerceRootAndChildBySKU, get_woocommerce_product_list ,substract
 const { Console } = require('console');
 const parser = new xml2js.Parser();
 const current_date = new Date();
-current_date.setUTCHours(0,0,0,0)
-console.log(current_date)
+current_date.setTime( current_date.getTime() - new Date().getTimezoneOffset()*60*1000 );
+//current_date.setUTCHours(0,0,0,0)
+console.log('current_date',current_date)
 console.log(`Current path:  C:\\Program Files (x86)\\caja\\Xmls\\journal\\${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }\\${process.env.CURRENT_CADENA}${process.env.CURRENT_STORE}${process.env.CURRENT_CAJA}${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }${current_date.getDate() > 9 ? current_date.getDate() : '0'+(current_date.getDate()).toString() }.xml`);
 fs.readFile(`C:\\Program Files (x86)\\caja\\Xmls\\journal\\${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }\\${process.env.CURRENT_CADENA}${process.env.CURRENT_STORE}${process.env.CURRENT_CAJA}${current_date.getFullYear()}${current_date.getMonth()+1 > 9 ? current_date.getMonth()+1 : '0'+(current_date.getMonth()+1).toString() }${current_date.getDate() > 9 ? current_date.getDate() : '0'+(current_date.getDate()).toString() }.xml`, function(err, data) {
     if (err){
@@ -28,11 +29,11 @@ fs.readFile(`C:\\Program Files (x86)\\caja\\Xmls\\journal\\${current_date.getFul
         const product_results = [ ...ticket_results, ...cambio_results, ...nota_results ];
         console.log('Products length: ',product_results.length)
         //Get E-commerce product List
-        const woocommerce_product_list = await get_woocommerce_product_list();
+        //const woocommerce_product_list = await get_woocommerce_product_list();
         //
         for (let i = 0; i < product_results.length; i++) {
           //Search If exists product reference into woocommerce eshop
-          const woocommerce_product = await getWoocommerceRootAndChildBySKU(product_results[i].reference, woocommerce_product_list);
+          const woocommerce_product = await getWoocommerceRootAndChildBySKU(product_results[i].reference);
           console.log('woocommerce_product',product_results[i].reference, woocommerce_product ? woocommerce_product.child_product.sku : woocommerce_product);
           if (woocommerce_product){
             //Search if transactions exists into firestore
