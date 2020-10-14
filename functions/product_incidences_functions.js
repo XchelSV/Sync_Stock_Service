@@ -98,7 +98,7 @@ exports.get_product_from_nota_mostrador= (json_file) => {
 }
 
 exports.search_transaction_into_firestore = async (transaction) => {
-    const transaction_finded = await db.collection('transactions').doc(transaction.id).get()
+    const transaction_finded = await db.collection('store').doc(process.env.CURRENT_STORE).collection('transactions').doc(transaction.id).get()
     .then( result => {
         return result.data();
     })
@@ -113,7 +113,7 @@ exports.search_transaction_into_firestore = async (transaction) => {
 
 exports.save_transaction_into_firestore = (transaction) => {
     try{
-        let transaction_red = db.collection('transactions').doc(transaction.id);
+        let transaction_red = db.collection('store').doc(process.env.CURRENT_STORE).collection('transactions').doc(transaction.id);
         let setNewTransaction = transaction_red.set({
             'reference': transaction.reference,
             'store': transaction.store,
