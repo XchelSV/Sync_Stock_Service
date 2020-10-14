@@ -45,20 +45,21 @@ exports.get_woocommerce_product_list = async () => {
     }
 }
 
-exports.getWoocommerceRootAndChildBySKU = async (sku, results) => {
+exports.getWoocommerceRootAndChildBySKU = async (sku) => {
     try{
-        let counter = 1;
         let result = null
-        let root_product = '';
         let child_product = '';
         //Get Root Product
-        for (let i = 0; i < results.length; i++) {
-            if (results[i].sku === sku.slice(0,10)){
-                root_product = results[i];
-                break;
-            }
-        }
-        if (root_product !== ''){
+        const [root_product] = await WooCommerce.get(`products/?sku=${sku.slice(0,10)}`,{ status:'publish' })
+            .then( async (response) => {
+                return await response.data;
+            })
+            .catch( async (error) => {
+                return await null;
+            });
+        
+        console.log(sku,' root_product id',root_product ? root_product.id : null)
+        if (root_product){
             //Get Child Product
             const results = await WooCommerce.get(`products/${root_product.id}/variations`,{ status:'publish' })
                 .then( async (response) => {
