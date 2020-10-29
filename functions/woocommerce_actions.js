@@ -116,3 +116,35 @@ exports.substract_product = (woocommerce_product, quantity) => {
     });
 
 }
+
+exports.getPendingOrders = async (sku) => {
+    try{
+        let counter = 1;
+        let result = [];
+        flag = true;
+
+        while(flag){
+            const results = await WooCommerce.get("orders",{ status:'pending', page: counter, per_page: 30, order:'desc'})
+                .then( async (response) => {
+                    return await response.data;
+                })
+                .catch( async (error) => {
+                    return await [];
+                });
+            if (results.length > 0){
+                result = [ ...result, ...results]
+                counter++;
+            }
+            else{
+                flag = false;
+            }
+        }
+        return result;
+    }
+    catch(error){
+        console.log(error)
+        logger.error(`getPendingOrders function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`getPendingOrders`,error);
+        return null;
+    }
+}
