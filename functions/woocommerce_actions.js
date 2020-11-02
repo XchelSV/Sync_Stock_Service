@@ -148,3 +148,23 @@ exports.getPendingOrders = async (sku) => {
         return null;
     }
 }
+
+exports.getWoocommerceProductByModel = async (model) => {
+    try{
+        //Get Root Product
+        const [root_product] = await WooCommerce.get(`products/?sku=${model}`,{ status:'publish' })
+            .then( async (response) => {
+                return await response.data;
+            })
+            .catch( async (error) => {
+                return await null;
+            });
+        return root_product;
+    }
+    catch(error){
+        console.log(error)
+        logger.error(`getWoocommerceProductByModel function, error: ${JSON.stringify(error)}`);
+        sentry.send_error(`getWoocommerceProductByModel`,error);
+        return null;
+    }
+}
